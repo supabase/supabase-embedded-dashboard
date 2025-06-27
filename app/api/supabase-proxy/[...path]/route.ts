@@ -22,17 +22,23 @@ async function forwardToSupabaseAPI(
   url.port = "443";
   url.pathname = apiPath;
 
-  const projectRef = path[2];
+  // Check if this is a project-scoped endpoint (pattern: /v1/projects/{ref}/...)
+  const isProjectScopedEndpoint = path[1] === "projects";
+  const projectRef = isProjectScopedEndpoint ? path[2] : null;
 
-  // Implement your permission check here (e.g. check if the user is a member of the project)
-  // In this example, everyone can access all projects
-  const userHasPermissionForProject = Boolean(projectRef);
+  // For project-scoped endpoints, verify project access
+  // For user-scoped endpoints, allow access (API will handle user authorization)
+  if (isProjectScopedEndpoint) {
+    // Implement your permission check here (e.g. check if the user is a member of the project)
+    // In this example, everyone can access all projects
+    const userHasPermissionForProject = Boolean(projectRef);
 
-  if (!userHasPermissionForProject) {
-    return NextResponse.json(
-      { message: "You do not have permission to access this project." },
-      { status: 403 }
-    );
+    if (!userHasPermissionForProject) {
+      return NextResponse.json(
+        { message: "You do not have permission to access this project." },
+        { status: 403 }
+      );
+    }
   }
 
   try {

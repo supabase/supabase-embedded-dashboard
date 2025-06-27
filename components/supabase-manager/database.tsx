@@ -2,14 +2,19 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { z, type ZodTypeAny } from "zod";
-import { useListTables, useRunQuery } from "@/hooks/use-supabase-manager";
+import {
+  useListTables,
+  useRunQuery,
+  useGetSnippets,
+  useGetSnippet,
+} from "@/hooks/use-supabase-manager";
 import { SqlEditor } from "@/components/sql-editor";
 import { DynamicForm } from "@/components/dynamic-form";
 import { toast } from "sonner";
 import { useSheetNavigation } from "../../contexts/SheetNavigationContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Table, Wand } from "lucide-react";
+import { AlertTriangle, Table, Wand, FileText } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Helper to generate a Zod schema from the table's column definitions
@@ -254,6 +259,54 @@ function TableRecordsView({
   );
 }
 
+function SnippetView({
+  projectRef,
+  snippetId,
+  snippetName,
+  snippetDescription,
+}: {
+  projectRef: string;
+  snippetId: string;
+  snippetName: string;
+  snippetDescription?: string;
+}) {
+  const { data: snippet, isLoading, isError } = useGetSnippet(snippetId);
+
+  if (isLoading) {
+    return (
+      <div className="px-6 pt-4 pb-10 lg:px-12 lg:pt-10">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !snippet) {
+    return (
+      <div className="px-6 pt-4 pb-10 lg:px-12 lg:pt-10">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error loading snippet</AlertTitle>
+          <AlertDescription>
+            There was a problem loading this SQL snippet.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <SqlEditor
+      projectRef={projectRef}
+      initialSql={snippet.content?.sql || ""}
+      label={`${snippetName} - ${snippetDescription || "SQL Snippet"}`}
+    />
+  );
+}
+
 export function DatabaseManager({ projectRef }: { projectRef: string }) {
   const { push } = useSheetNavigation();
   const {
@@ -262,11 +315,34 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
     isError,
   } = useListTables(projectRef, ["public"]);
 
+  const {
+    data: snippetsData,
+    isLoading: isSnippetsLoading,
+    isError: isSnippetsError,
+  } = useGetSnippets({ projectRef, limit: "50" });
+
   const handleTableClick = useCallback(
     (table: any) => {
       push({
         title: table.name,
         component: <TableRecordsView projectRef={projectRef} table={table} />,
+      });
+    },
+    [push, projectRef]
+  );
+
+  const handleSnippetClick = useCallback(
+    (snippet: any) => {
+      push({
+        title: snippet.name,
+        component: (
+          <SnippetView
+            projectRef={projectRef}
+            snippetId={snippet.id}
+            snippetName={snippet.name}
+            snippetDescription={snippet.description}
+          />
+        ),
       });
     },
     [push, projectRef]
@@ -353,6 +429,70 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
           </AlertDescription>
         </Alert>
       ) : null}
+
+      {/* Snippets Section */}
+      <div className="mt-12">
+        <h2 className="font-semibold mb-1">Snippets</h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Snippets are SQL queries that you can save and reuse.
+        </p>
+
+        {isSnippetsError && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error loading snippets</AlertTitle>
+            <AlertDescription>
+              There was a problem loading your SQL snippets.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {isSnippetsLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        )}
+
+        {snippetsData?.data && snippetsData.data.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {snippetsData.data.map((snippet: any) => (
+              <Button
+                variant="outline"
+                key={snippet.id}
+                size="lg"
+                className="flex-row justify-between text-left h-auto py-4"
+                onClick={() => handleSnippetClick(snippet)}
+              >
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium font-mono truncate">
+                    {snippet.name}
+                  </h3>
+                  {snippet.description && (
+                    <p className="text-xs text-muted-foreground truncate">
+                      {snippet.description}
+                    </p>
+                  )}
+                </div>
+                <div className="text-xs mono text-muted-foreground shrink-0">
+                  {snippet.visibility}
+                </div>
+              </Button>
+            ))}
+          </div>
+        ) : !isSnippetsLoading &&
+          (!snippetsData?.data || snippetsData.data.length === 0) ? (
+          <Alert className="mt-4">
+            <FileText className="h-4 w-4" />
+            <AlertTitle>No SQL snippets</AlertTitle>
+            <AlertDescription>
+              Create SQL snippets to save and reuse your queries.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+      </div>
     </div>
   );
 }

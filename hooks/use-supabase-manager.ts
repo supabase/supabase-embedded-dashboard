@@ -475,3 +475,77 @@ export const useDeleteSecrets = () => {
     },
   });
 };
+
+// GET Snippets
+const getSnippets = async ({
+  projectRef,
+  cursor,
+  limit,
+  sort_by,
+  sort_order,
+}: {
+  projectRef?: string;
+  cursor?: string;
+  limit?: string;
+  sort_by?: "inserted_at" | "name";
+  sort_order?: "asc" | "desc";
+}) => {
+  const { data, error } = await client.GET("/v1/snippets", {
+    params: {
+      query: {
+        cursor,
+        limit,
+        sort_by,
+        sort_order,
+        project_ref: projectRef,
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
+export const useGetSnippets = (
+  params: {
+    projectRef?: string;
+    cursor?: string;
+    limit?: string;
+    sort_by?: "inserted_at" | "name";
+    sort_order?: "asc" | "desc";
+  } = {}
+) => {
+  return useQuery({
+    queryKey: ["snippets", params],
+    queryFn: () => getSnippets(params),
+    retry: false,
+    enabled: !!params.projectRef, // Only fetch when projectRef is available
+  });
+};
+
+// GET Single Snippet
+const getSnippet = async (id: string) => {
+  const { data, error } = await client.GET("/v1/snippets/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
+export const useGetSnippet = (id: string) => {
+  return useQuery({
+    queryKey: ["snippet", id],
+    queryFn: () => getSnippet(id),
+    enabled: !!id,
+    retry: false,
+  });
+};
