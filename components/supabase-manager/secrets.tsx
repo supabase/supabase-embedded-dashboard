@@ -15,8 +15,8 @@ import {
   useCreateSecrets,
   useDeleteSecrets,
   useGetSecrets,
-} from "@/hooks/use-supabase-manager";
-import { secretsSchema } from "@/lib/schemas";
+} from "@/hooks/use-secrets";
+import { secretsSchema } from "@/lib/schemas/secrets";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, Minus, PlusIcon, Key } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
