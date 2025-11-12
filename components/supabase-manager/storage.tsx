@@ -1,8 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
-import { useSheetNavigation } from "../../contexts/SheetNavigationContext";
-import { useGetBuckets, useListObjects } from "@/hooks/use-supabase-manager";
+import { useGetBuckets } from "@/hooks/use-storage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

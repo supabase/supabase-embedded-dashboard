@@ -1,10 +1,7 @@
 "use client";
 
 import { DynamicForm } from "@/components/dynamic-form";
-import {
-  useGetAuthConfig,
-  useUpdateAuthConfig,
-} from "@/hooks/use-supabase-manager";
+import { useGetAuthConfig, useUpdateAuthConfig } from "@/hooks/use-auth";
 import {
   authEmailProviderSchema,
   authFieldLabels,
@@ -12,7 +9,7 @@ import {
   type AuthGeneralSettingsSchema,
   authGoogleProviderSchema,
   authPhoneProviderSchema,
-} from "@/lib/schemas";
+} from "@/lib/schemas/auth";
 import { AlertTriangle, ChevronRight, Mail, Phone, User } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { z } from "zod";
