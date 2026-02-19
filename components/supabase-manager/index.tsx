@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -68,43 +68,46 @@ function DialogView({
   const currentView = stack[stack.length - 1];
   const activeManager = stack.length > 0 ? stack[0].title : null;
 
-  const navigationItems = [
-    {
-      title: "Database",
-      icon: Database,
-      component: <DatabaseManager projectRef={projectRef} />,
-    },
-    {
-      title: "Storage",
-      icon: HardDrive,
-      component: <StorageManager projectRef={projectRef} />,
-    },
-    {
-      title: "Auth",
-      icon: Shield,
-      component: <AuthManager projectRef={projectRef} />,
-    },
-    {
-      title: "Users",
-      icon: Users,
-      component: <UsersManager projectRef={projectRef} />,
-    },
-    {
-      title: "Secrets",
-      icon: KeyRound,
-      component: <SecretsManager projectRef={projectRef} />,
-    },
-    {
-      title: "Logs",
-      icon: ScrollText,
-      component: <LogsManager projectRef={projectRef} />,
-    },
-    {
-      title: "Suggestions",
-      icon: Lightbulb,
-      component: <SuggestionsManager projectRef={projectRef} />,
-    },
-  ];
+  const navigationItems = useMemo(
+    () => [
+      {
+        title: "Database",
+        icon: Database,
+        component: <DatabaseManager projectRef={projectRef} />,
+      },
+      {
+        title: "Storage",
+        icon: HardDrive,
+        component: <StorageManager projectRef={projectRef} />,
+      },
+      {
+        title: "Auth",
+        icon: Shield,
+        component: <AuthManager projectRef={projectRef} />,
+      },
+      {
+        title: "Users",
+        icon: Users,
+        component: <UsersManager projectRef={projectRef} />,
+      },
+      {
+        title: "Secrets",
+        icon: KeyRound,
+        component: <SecretsManager projectRef={projectRef} />,
+      },
+      {
+        title: "Logs",
+        icon: ScrollText,
+        component: <LogsManager projectRef={projectRef} />,
+      },
+      {
+        title: "Suggestions",
+        icon: Lightbulb,
+        component: <SuggestionsManager projectRef={projectRef} />,
+      },
+    ],
+    [projectRef]
+  );
 
   if (isMobile) {
     return (

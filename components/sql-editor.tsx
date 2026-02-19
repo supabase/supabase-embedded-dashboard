@@ -5,7 +5,7 @@ import { Editor } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { ResultsTable } from "@/components/results-table";
 import { Label } from "@/components/ui/label";
-import { useRunQuery } from "@/hooks/use-supabase-manager";
+import { useRunQuery } from "@/hooks/use-run-query";
 import {
   ArrowUp,
   Loader2,

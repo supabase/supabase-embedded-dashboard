@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { z, type ZodTypeAny } from "zod";
-import { useListTables, useRunQuery } from "@/hooks/use-supabase-manager";
+import { useListTables } from "@/hooks/use-tables";
+import { useRunQuery } from "@/hooks/use-run-query";
 import { SqlEditor } from "@/components/sql-editor";
 import { DynamicForm } from "@/components/dynamic-form";
 import { toast } from "sonner";

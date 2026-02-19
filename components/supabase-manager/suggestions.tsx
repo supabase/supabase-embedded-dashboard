@@ -1,16 +1,11 @@
 "use client";
 
-import { useGetSuggestions } from "@/hooks/use-supabase-manager";
+import { useGetSuggestions } from "@/hooks/use-suggestions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+
 import ReactMarkdown from "react-markdown";
 import { Skeleton } from "@/components/ui/skeleton";
 
